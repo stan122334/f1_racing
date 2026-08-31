@@ -4,55 +4,77 @@ using UnityEngine;
 
 public class FollowThePath : MonoBehaviour
 {
-
-    // Array of waypoints to walk from one to the next one
     [SerializeField]
     private Transform[] Circle;
 
-    // Walk speed that can be set in Inspector
     [SerializeField]
     private float moveSpeed = 2f;
 
-    // Index of current waypoint from which Enemy walks
-    // to the next one
+    [SerializeField]
+    private float acceleration = 5f;
+
+    [SerializeField]
+    private float braking = 8f;
+
+    [SerializeField]
+    private float[] targetSpeeds;
+
     private int CircleIndex = 0;
 
-    // Use this for initialization
     private void Start()
     {
+        transform.position = Circle[CircleIndex].position;
 
-        // Set position of Enemy as position of the first waypoint
-        transform.position = Circle[CircleIndex].transform.position;
+        // Start at the first target speed
+        if (targetSpeeds.Length > 0)
+        {
+            moveSpeed = targetSpeeds[0];
+        }
     }
 
-    // Update is called once per frame
     private void Update()
     {
-
-        // Move Enemy
         Move();
     }
 
-    // Method that actually make Enemy walk
     private void Move()
     {
-        // If Enemy didn't reach last waypoint it can move
-        // If enemy reached last waypoint then it stops
         if (CircleIndex <= Circle.Length - 1)
         {
+            transform.position = Vector2.MoveTowards(
+                transform.position,
+                Circle[CircleIndex].position,
+                moveSpeed * Time.deltaTime
+            );
 
-            // Move Enemy from current waypoint to the next one
-            // using MoveTowards method
-            transform.position = Vector2.MoveTowards(transform.position,
-               Circle[CircleIndex].transform.position,
-               moveSpeed * Time.deltaTime);
-
-            // If Enemy reaches position of waypoint he walked towards
-            // then waypointIndex is increased by 1
-            // and Enemy starts to walk to the next waypoint
-            if (transform.position == Circle[CircleIndex].transform.position)
+            // Reached waypoint
+            if (transform.position == Circle[CircleIndex].position)
             {
-                CircleIndex += 1;
+                CircleIndex++;
+
+                // Get the target speed for the next waypoint
+                if (CircleIndex < targetSpeeds.Length)
+                {
+                    float targetSpeed = targetSpeeds[CircleIndex];
+
+                    // Accelerate or brake
+                    if (targetSpeed > moveSpeed)
+                    {
+                        moveSpeed = Mathf.MoveTowards(
+                            moveSpeed,
+                            targetSpeed,
+                            acceleration * Time.deltaTime
+                        );
+                    }
+                    else
+                    {
+                        moveSpeed = Mathf.MoveTowards(
+                            moveSpeed,
+                            targetSpeed,
+                            braking * Time.deltaTime
+                        );
+                    }
+                }
             }
         }
     }
