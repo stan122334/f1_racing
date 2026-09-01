@@ -2089,9 +2089,11 @@ MonoBehaviour:
   - {fileID: 962726886}
   - {fileID: 1276608097}
   moveSpeed: 2
-  acceleration: 5
-  braking: 8
-  targetSpeeds: []
+  acceleration: 0.5
+  braking: 0.5
+  lookAhead: 5
+  maxSpeed: 2
+  minSpeed: 0.2
 --- !u!1 &336283942
 GameObject:
   m_ObjectHideFlags: 0
