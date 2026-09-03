@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,38 +44,53 @@ public class FollowThePath : MonoBehaviour
 
     private void Move()
     {
-        if (CircleIndex <= Circle.Length - 1)
-        {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                Circle[CircleIndex].position,
-                moveSpeed * Time.deltaTime
-            );
+        // Move towards the current waypoint
+        transform.position = Vector2.MoveTowards(
+            transform.position,
+            Circle[CircleIndex].position,
+            moveSpeed * Time.deltaTime
+        );
 
-            if (transform.position == Circle[CircleIndex].position)
+        // When we reach the waypoint
+        if (transform.position == Circle[CircleIndex].position)
+        {
+            CircleIndex++;
+
+            // If we reach the end of the track,
+            // go back to the first waypoint
+            if (CircleIndex >= Circle.Length)
             {
-                CircleIndex++;
+                CircleIndex = 0;
             }
         }
     }
 
     private void ChangeSpeed()
     {
-        // We need enough waypoints to look ahead
-        if (CircleIndex + lookAhead >= Circle.Length)
+        // Make sure we have enough waypoints
+        if (Circle.Length < 2)
         {
             return;
         }
 
+        // Get the current waypoint and wrap around the track
+        int currentIndex = CircleIndex;
+        int nextIndex = (CircleIndex + 1) % Circle.Length;
+
+        // Look ahead and wrap around the track
+        int futureIndex = (CircleIndex + lookAhead) % Circle.Length;
+        int futurePreviousIndex =
+            (CircleIndex + lookAhead - 1) % Circle.Length;
+
         // Direction from current waypoint to the next waypoint
         Vector2 currentDirection =
-            Circle[CircleIndex + 1].position -
-            Circle[CircleIndex].position;
+            Circle[nextIndex].position -
+            Circle[currentIndex].position;
 
         // Direction further ahead
         Vector2 futureDirection =
-            Circle[CircleIndex + lookAhead].position -
-            Circle[CircleIndex + lookAhead - 1].position;
+            Circle[futureIndex].position -
+            Circle[futurePreviousIndex].position;
 
         // Calculate how much the track is turning
         float cornerAngle =
