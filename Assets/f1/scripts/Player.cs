@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using TMPro;
 
@@ -14,49 +13,78 @@ public class Player : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Lap4Text;
     [SerializeField] private TextMeshProUGUI Lap5Text;
 
-    private float timer = 0f;
+    [Header("Timer Settings")]
+    [SerializeField] private float timerSpeed = 2f;
 
+    private float timer = 0f;
     private int lapNumber = 1;
+
+    private bool canFinishLap = true;
+
+    private void Start()
+    {
+        timer = 0f;
+        lapNumber = 1;
+
+        TimerText.text = "00:00.000";
+
+        Lap1Text.text = "";
+        Lap2Text.text = "";
+        Lap3Text.text = "";
+        Lap4Text.text = "";
+        Lap5Text.text = "";
+    }
 
     private void Update()
     {
-        // Keep the current lap timer running
-        timer += Time.deltaTime * 2f;
+        // Timer runs at 2x speed
+        timer += Time.deltaTime * timerSpeed;
 
-        // Display the current lap time
         TimerText.text = FormatTime(timer);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if we have crossed the finish line
-        if (other.CompareTag("Finish"))
+        Debug.Log("TRIGGER DETECTED: " + other.gameObject.name);
+
+        if (other.CompareTag("Finish") && canFinishLap)
         {
-            CompleteLap();
+            FinishLap();
+
+            canFinishLap = false;
         }
     }
 
-    private void CompleteLap()
+    private void OnTriggerExit2D(Collider2D other)
     {
-        // Get the completed lap time
-        string completedLapTime = FormatTime(timer);
+        if (other.CompareTag("Finish"))
+        {
+            canFinishLap = true;
+        }
+    }
 
-        // Move all previous lap times down one position
+    private void FinishLap()
+    {
+        Debug.Log("LAP " + lapNumber + " FINISHED!");
+
+        // Save the completed lap time
+        string lapTime = FormatTime(timer);
+
+        // Move old lap times down
         Lap5Text.text = Lap4Text.text;
         Lap4Text.text = Lap3Text.text;
         Lap3Text.text = Lap2Text.text;
         Lap2Text.text = Lap1Text.text;
 
-        // Put the newest lap at the top
-        Lap1Text.text = "Lap " + lapNumber + ": " + completedLapTime;
+        // Save newest lap
+        Lap1Text.text = "Lap " + lapNumber + ": " + lapTime;
 
-        // Increase the lap number
+        // Next lap
         lapNumber++;
 
-        // Reset the current lap timer
+        // RESET TIMER
         timer = 0f;
 
-        // Immediately show 00:00.000
         TimerText.text = "00:00.000";
     }
 
@@ -71,6 +99,3 @@ public class Player : MonoBehaviour
                milliseconds.ToString("000");
     }
 }
-
-
- 

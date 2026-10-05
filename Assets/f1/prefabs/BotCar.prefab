@@ -106,9 +106,9 @@ MonoBehaviour:
   maxSpeed: 1
   minSpeed: 0.2
   randomize: 1
-  skillRange: {x: 0.92, y: 1}
-  paceJitter: 0.03
-  mistakeChance: 0.02
+  skillRange: {x: 0.95, y: 1}
+  paceJitter: 0.01
+  mistakeChance: 0.001
   mistakeSpeedMultiplier: 0.6
   mistakeDurationRange: {x: 1, y: 2.5}
   maxLateralOffset: 0.5
